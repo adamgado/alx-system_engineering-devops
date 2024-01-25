@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#display ls contents
+content=$("ls")
+for a in $content
+do
+    echo "$a" | cut -d '-' -f2
+done
