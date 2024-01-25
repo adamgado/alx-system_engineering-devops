@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#display clock times
+a=0
+while [ "$a" -le 12 ]
+do
+    echo "Hour: $a"
+    b=1
+    while [ "$b" -le 59 ]
+    do
+        echo "$b"
+        b=$(( b + 1 ))
+    done
+    a=$(( a + 1 ))
+done
