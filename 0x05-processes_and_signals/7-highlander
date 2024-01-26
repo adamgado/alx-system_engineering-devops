@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#display text indefinitely with
+#display text indefinitely with condition
 while true
 do
   echo "To infinity and beyond"
