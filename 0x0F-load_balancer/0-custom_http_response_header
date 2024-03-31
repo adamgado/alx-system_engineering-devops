@@ -1,23 +1,37 @@
 #!/usr/bin/env bash
-# configures a new Ubuntu machine
-apt-get -y update
-apt-get -y install nginx
-HOST_NAME=$(hostname)
-HEADER="\\\n\tadd_header X-Served-By $HOST_NAME;\n"
-FIND=$(grep "X-Server-by" /etc/nginx/sites-available/default)
-if [[ -z $FIND ]]; then
-    sed -i "23i $HEADER" /etc/nginx/sites-available/default
+# 
+# Configure Nginx so that its HTTP response contains
+# a custom header
+#
+
+link="https://www.youtube.com/watch?v=QH2-TGUlwu4"
+new_conf="server_name _;\n\trewrite ^/redirect_me/$ $link permanent;"
+location_error="location = /404.html {\n\t\troot /var/www/html/;\n\t\tinternal;\n"
+error_directive="error_page 404 /404.html;\n\t$location_error"
+error_404="}\n\n\t$error_directive\t}"
+
+sudo apt update
+sudo apt install -y nginx
+sudo ufw allow 'Nginx HTTP'
+echo "Hello World!" | sudo tee /var/www/html/index.html
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
+sudo sed -i "s|server_name\ _;|$new_conf|" /etc/nginx/sites-available/default
+sudo sed -i "0,/}/ s|}|$error_404|" /etc/nginx/sites-available/default
+sudo service nginx restart
+
+config_file="/etc/nginx/nginx.conf"
+
+if ! sudo grep -q "add_header X-Served-By" $config_file;
+then
+    header_key="X-Served-By"
+    header_value="\$hostname"
+    header="add_header $header_key $header_value;"
+    search="http {"
+    new_conf="$search\n\t$header"
+
+    # Replace the value found with the new configuration
+    sudo sed -i "s|$search|$new_conf|" $config_file
+
+    # Restart Nginx Service
+    sudo service nginx restart
 fi
-echo "Hello World!" > /var/www/html/index.html
-FIND=$(grep "redirect_me" /etc/nginx/sites-available/default)
-STRING="\\\n\tlocation /redirect_me {\n\t\t return 301 https://www.youtube.com/watch?v=3MbaGJN2ioQ;\n\t}\n"
-if [[ -z $FIND ]]; then
-    sed -i "42i $STRING" /etc/nginx/sites-available/default
-fi
-FIND=$(grep "error_page 404" /etc/nginx/sites-available/default)
-ERROR="\\\n\terror_page 404 /custom_404.html;\n"
-if [[ -z $FIND ]]; then
-    echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
-    sed -i "40i $ERROR" /etc/nginx/sites-available/default
-fi
-service nginx restart
