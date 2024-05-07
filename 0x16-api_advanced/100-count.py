@@ -9,12 +9,12 @@ def count_words(subreddit, word_list, instances={}, after="", count=0):
     headers = {
         "User-Agent": "linux:0x16.api.advanced:v1.0.0 (by /u/edev_)"
     }
-    prm = {
+    params = {
         "after": after,
         "count": count,
         "limit": 100
     }
-    r = requests.get(link, headers=headers, params=prm,
+    r = requests.get(link, headers=headers, params=params,
                             allow_redirects=False)
     try:
         a = r.json()
