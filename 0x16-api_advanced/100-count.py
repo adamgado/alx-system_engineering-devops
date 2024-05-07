@@ -3,18 +3,18 @@
 import requests
 
 
-def count_words(subreddit, word_list, instances={}, after="", count=0):
+def nb_words(subreddit, word_list, instances={}, next_one="", nb=0):
     """Prints counts of given words found in hot posts of a given subreddit"""
     link = "https://www.reddit.com/r/{}/hot/.json".format(subreddit)
     headers = {
         "User-Agent": "linux:0x16.api.advanced:v1.0.0 (by /u/edev_)"
     }
-    params = {
-        "after": after,
-        "count": count,
+    prm = {
+        "after": next_one,
+        "count": nb,
         "limit": 100
     }
-    r = requests.get(link, headers=headers, params=params,
+    r = requests.get(link, headers=headers, params=prm,
                             allow_redirects=False)
     try:
         a = r.json()
@@ -25,8 +25,8 @@ def count_words(subreddit, word_list, instances={}, after="", count=0):
         return
 
     a = a.get("data")
-    after = a.get("after")
-    count += a.get("dist")
+    next_one = a.get("after")
+    nb += a.get("dist")
     for x in a.get("children"):
         title = x.get("data").get("title").lower().split()
         for w in word_list:
@@ -37,11 +37,11 @@ def count_words(subreddit, word_list, instances={}, after="", count=0):
                 else:
                     instances[w] += times
 
-    if after is None:
+    if next_one is None:
         if len(instances) == 0:
             print("")
             return
         instances = sorted(instances.items(), key=lambda kv: (-kv[1], kv[0]))
         [print("{}: {}".format(k, v)) for k, v in instances]
     else:
-        count_words(subreddit, word_list, instances, after, count)
+        nb_words(subreddit, word_list, instances, next_one, nb)
