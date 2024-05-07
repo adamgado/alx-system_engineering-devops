@@ -10,8 +10,8 @@ def count_words(subreddit, word_list, instances={}, next_one="", nb=0):
         "User-Agent": "linux:0x16.api.advanced:v1.0.0 (by /u/edev_)"
     }
     prm = {
-        "next_one": next_one,
-        "nb": nb,
+        "after": next_one,
+        "count": nb,
         "limit": 100
     }
     r = requests.get(link, headers=headers, params=prm,
@@ -25,7 +25,7 @@ def count_words(subreddit, word_list, instances={}, next_one="", nb=0):
         return
 
     a = a.get("data")
-    next_one = a.get("next_one")
+    next_one = a.get("after")
     nb += a.get("dist")
     for x in a.get("children"):
         title = x.get("data").get("title").lower().split()
