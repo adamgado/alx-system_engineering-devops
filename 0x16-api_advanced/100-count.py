@@ -3,7 +3,7 @@
 import requests
 
 
-def nb_words(subreddit, word_list, instances={}, next_one="", nb=0):
+def count_words(subreddit, word_list, instances={}, next_one="", nb=0):
     """parses all hot articles prints a sorted count of given keywords"""
     link = "https://www.reddit.com/r/{}/hot/.json".format(subreddit)
     headers = {
