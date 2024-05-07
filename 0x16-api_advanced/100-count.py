@@ -1,47 +1,55 @@
 #!/usr/bin/python3
-"""recursive function that queries the Reddit API"""
+"""Function to count words in all hot posts of a given Reddit subreddit."""
 import requests
 
 
-def count_words(subreddit, word_list, instances={}, next_one="", nb=0):
-    """parses all hot articles prints a sorted count of given keywords"""
-    link = "https://www.reddit.com/r/{}/hot/.json".format(subreddit)
+def count_words(subreddit, word_list, instances={}, after="", count=0):
+    """Prints counts of given words found in hot posts of a given subreddit.
+
+    Args:
+        subreddit (str): The subreddit to search.
+        word_list (list): The list of words to search for in post titles.
+        instances (obj): Key/value pairs of words/counts.
+        after (str): The parameter for the next page of the API results.
+        count (int): The parameter of results matched thus far.
+    """
+    url = "https://www.reddit.com/r/{}/hot/.json".format(subreddit)
     headers = {
         "User-Agent": "linux:0x16.api.advanced:v1.0.0 (by /u/edev_)"
     }
-    prm = {
-        "after": next_one,
-        "count": nb,
+    params = {
+        "after": after,
+        "count": count,
         "limit": 100
     }
-    r = requests.get(link, headers=headers, params=prm,
+    response = requests.get(url, headers=headers, params=params,
                             allow_redirects=False)
     try:
-        a = r.json()
-        if r.status_code == 404:
+        results = response.json()
+        if response.status_code == 404:
             raise Exception
     except Exception:
         print("")
         return
 
-    a = a.get("data")
-    next_one = a.get("after")
-    nb += a.get("dist")
-    for x in a.get("children"):
-        title = x.get("data").get("title").lower().split()
-        for w in word_list:
-            if w.lower() in title:
-                times = len([t for t in title if t == w.lower()])
-                if instances.get(w) is None:
-                    instances[w] = times
+    results = results.get("data")
+    after = results.get("after")
+    count += results.get("dist")
+    for c in results.get("children"):
+        title = c.get("data").get("title").lower().split()
+        for word in word_list:
+            if word.lower() in title:
+                times = len([t for t in title if t == word.lower()])
+                if instances.get(word) is None:
+                    instances[word] = times
                 else:
-                    instances[w] += times
+                    instances[word] += times
 
-    if next_one is None:
+    if after is None:
         if len(instances) == 0:
             print("")
             return
         instances = sorted(instances.items(), key=lambda kv: (-kv[1], kv[0]))
         [print("{}: {}".format(k, v)) for k, v in instances]
     else:
-        nb_words(subreddit, word_list, instances, next_one, nb)
+        count_words(subreddit, word_list, instances, after, count)
