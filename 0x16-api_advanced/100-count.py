@@ -1,49 +1,41 @@
 #!/usr/bin/python3
-"""Function to count words in all hot posts of a given Reddit subreddit."""
+"""recursive function that queries the Reddit API"""
 import requests
 
 
 def count_words(subreddit, word_list, instances={}, after="", count=0):
-    """Prints counts of given words found in hot posts of a given subreddit.
-
-    Args:
-        subreddit (str): The subreddit to search.
-        word_list (list): The list of words to search for in post titles.
-        instances (obj): Key/value pairs of words/counts.
-        after (str): The parameter for the next page of the API results.
-        count (int): The parameter of results matched thus far.
-    """
-    url = "https://www.reddit.com/r/{}/hot/.json".format(subreddit)
+    """Prints counts of given words found in hot posts of a given subreddit"""
+    link = "https://www.reddit.com/r/{}/hot/.json".format(subreddit)
     headers = {
         "User-Agent": "linux:0x16.api.advanced:v1.0.0 (by /u/edev_)"
     }
-    params = {
+    prm = {
         "after": after,
         "count": count,
         "limit": 100
     }
-    response = requests.get(url, headers=headers, params=params,
+    r = requests.get(link, headers=headers, params=prm,
                             allow_redirects=False)
     try:
-        results = response.json()
-        if response.status_code == 404:
+        a = r.json()
+        if r.status_code == 404:
             raise Exception
     except Exception:
         print("")
         return
 
-    results = results.get("data")
-    after = results.get("after")
-    count += results.get("dist")
-    for c in results.get("children"):
-        title = c.get("data").get("title").lower().split()
-        for word in word_list:
-            if word.lower() in title:
-                times = len([t for t in title if t == word.lower()])
-                if instances.get(word) is None:
-                    instances[word] = times
+    a = a.get("data")
+    after = a.get("after")
+    count += a.get("dist")
+    for x in a.get("children"):
+        title = x.get("data").get("title").lower().split()
+        for w in word_list:
+            if w.lower() in title:
+                times = len([t for t in title if t == w.lower()])
+                if instances.get(w) is None:
+                    instances[w] = times
                 else:
-                    instances[word] += times
+                    instances[w] += times
 
     if after is None:
         if len(instances) == 0:
