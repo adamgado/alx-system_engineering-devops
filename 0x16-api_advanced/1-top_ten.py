@@ -8,7 +8,7 @@ def top_ten(subreddit):
     lnk = "https://www.reddit.com/r/{}/about.json".format(subreddit)
     req = requests.get(lnk, headers={"User-Agent": "simplemitten"}
                        ,params={"limit": 10}, allow_redirects=False)
-    if req.status_code != 404:
+    if req.status_code < 300:
         result = req.json().get("data")
         for a in results.get("children"):
             print(a.get("data").get("title"))
