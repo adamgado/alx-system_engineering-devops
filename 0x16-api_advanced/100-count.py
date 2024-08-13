@@ -19,7 +19,7 @@ def count_words(subreddit, word_list, count=0, after="", instances={}):
     after = results.get("after")
     count += results.get("dist")
     for a in results.get("children"):
-        title = a.get("data").get("title")).lower().split()
+        title = a.get("data").get("title").lower().split()
         for b in word_list:
             if b.lower() in title:
                 num = len([c for c in title if c == b.lower()])
