@@ -8,7 +8,7 @@ def recurse(subreddit, hot_list=[], next="", num=0):
     lnk = "https://www.reddit.com/r/{}/about.json".format(subreddit)
     req = requests.get(lnk, headers={"User-Agent": "simplemitten"}
                        , params={"after": next, "count": num, "limit": 10}, allow_redirects=False)
-    if req.status_code == 404:
+    if req.status_code < 300:
         return None
     result = req.json().get("data")
     next = results.get("after")
