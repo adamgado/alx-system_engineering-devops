@@ -10,12 +10,13 @@ def count_words(subreddit, word_list, count=0, after="", instances={}):
                        params={"after": after, "count": count, "limit": 100},
                        allow_redirects=False)
     try:
-        results = req.json().get("data")
-        if req.status_code != 200:
+        results = req.json()
+        if req.status_code == 404:
             raise Exception
     except Exception:
         print("")
         return
+    results = results.get("data")
     after = results.get("after")
     count += results.get("dist")
     for a in results.get("children"):
