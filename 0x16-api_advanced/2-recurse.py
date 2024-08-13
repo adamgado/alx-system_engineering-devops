@@ -9,7 +9,7 @@ def recurse(subreddit, hot_list=[], count=0, after=""):
     req = requests.get(lnk, headers={"User-Agent": "simplemitten"}
                        , params={"after": after, "count": count, "limit": 10}
                        , allow_redirects=False)
-    if req.status_code == 404:
+    if req.status_code != 200:
         return None
     result = req.json().get("data")
     after = results.get("after")
