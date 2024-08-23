@@ -1,11 +1,6 @@
 # fix server to handle more traffic
 
 exec { 'fix':
-  command => 'sed -i "s/15/4096/" /etc/default/nginx',
-  path    => '/usr/local/bin/:/bin/'
-} ->
-
-exec { 'restart':
-  command => 'nginx restart',
-  path    => '/etc/init.d/'
+  command => 'sed -i "s/15/10000/" /etc/default/nginx && sudo service nginx restart',
+  path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games',
 }
